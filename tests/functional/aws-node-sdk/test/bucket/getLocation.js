@@ -15,6 +15,8 @@ describe('GET bucket location', () => {
     withV4(sigCfg => {
         const bucketUtil = new BucketUtility('default', sigCfg);
         const s3 = bucketUtil.s3;
+        const otherAccountBucketUtility = new BucketUtility('lisa', {});
+        const otherAccountS3 = otherAccountBucketUtility.s3;
 
         locations.forEach(location => {
             describe(`on bucket with location ${location}`, () => {
@@ -51,6 +53,28 @@ describe('GET bucket location', () => {
                     assert.strictEqual(err, null,
                         `Found unexpected err ${err}`);
                     assert.deepStrictEqual(data.LocationConstraint, '');
+                    return done();
+                });
+            });
+        });
+
+        describe('with existing configuration', () => {
+            before(done => s3.createBucketAsync(
+                {
+                    Bucket: bucketName,
+                    CreateBucketConfiguration: {
+                        LocationConstraint: 'us-west-1',
+                    },
+                }, done));
+            after(() => bucketUtil.deleteOne(bucketName));
+
+            it('should return AccessDenied if user is not bucket owner',
+            done => {
+                otherAccountS3.getBucketLocation({ Bucket: bucketName },
+                err => {
+                    assert(err);
+                    assert.strictEqual(err.code, 'AccessDenied');
+                    assert.strictEqual(err.statusCode, 403);
                     return done();
                 });
             });
