@@ -6,10 +6,22 @@ import BucketUtility from '../../lib/utility/bucket-util';
 const bucketName = 'testgetlocationbucket';
 
 // Change these locations with the config ones
-const locations = ['us-west-1', 'us-west-2', 'ca-central-1',
- 'EU', 'eu-west-1', 'eu-west-2', 'eu-central-1', 'ap-south-1', 'ap-southeast-1',
+const configLocationConstraints = {
+    'aws-us-east-1': 'aws-us-east-1-value',
+    'aws-us-east-test': 'aws-us-east-test-value',
+    'scality-us-east-1': 'scality-us-east-1-value',
+    'scality-us-west-1': 'scality-us-west-1-value',
+    'virtual-user-metadata': 'virtual-user-metadata-value',
+    'file': 'file-value',
+    'mem': 'mem-value',
+};
+
+const AWSregions = ['us-west-1', 'us-west-2', 'ca-central-1',
+'EU', 'eu-west-1', 'eu-west-2', 'eu-central-1', 'ap-south-1', 'ap-southeast-1',
 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'sa-east-1',
 'us-east-2'];
+
+const itSkipIfAWS = process.env.AWS_ON_AIR ? it.skip : it;
 
 describe('GET bucket location', () => {
     withV4(sigCfg => {
@@ -18,8 +30,8 @@ describe('GET bucket location', () => {
         const otherAccountBucketUtility = new BucketUtility('lisa', {});
         const otherAccountS3 = otherAccountBucketUtility.s3;
 
-        locations.forEach(location => {
-            describe(`on bucket with location ${location}`, () => {
+        AWSregions.forEach(location => {
+            describe(`on bucket with AWS region location: ${location}`, () => {
                 before(done => s3.createBucketAsync(
                     {
                         Bucket: bucketName,
@@ -42,11 +54,36 @@ describe('GET bucket location', () => {
                 });
             });
         });
+        Object.keys(configLocationConstraints).forEach(
+        location => {
+            describe(`on bucket with S3 server location: ${location}`, () => {
+                before(done => s3.createBucketAsync(
+                    {
+                        Bucket: bucketName,
+                        CreateBucketConfiguration: {
+                            LocationConstraint: location,
+                        },
+                    }, done));
+                after(() => bucketUtil.deleteOne(bucketName));
+
+                itSkipIfAWS('should return location configuration successfully',
+                done => {
+                    s3.getBucketLocation({ Bucket: bucketName },
+                    (err, data) => {
+                        assert.strictEqual(err, null,
+                            `Found unexpected err ${err}`);
+                        assert.deepStrictEqual(data.LocationConstraint,
+                            location);
+                        return done();
+                    });
+                });
+            });
+        });
 
         describe('on bucket without location configuration', () => {
             afterEach(() => bucketUtil.deleteOne(bucketName));
             before(done => s3.createBucketAsync({ Bucket: bucketName }, done));
-            it('should return empty string',
+            it('should return default location',
             done => {
                 s3.getBucketLocation({ Bucket: bucketName },
                 (err, data) => {
@@ -63,7 +100,7 @@ describe('GET bucket location', () => {
                 {
                     Bucket: bucketName,
                     CreateBucketConfiguration: {
-                        LocationConstraint: 'us-west-1',
+                        LocationConstraint: 'aws-us-east-1',
                     },
                 }, done));
             after(() => bucketUtil.deleteOne(bucketName));
