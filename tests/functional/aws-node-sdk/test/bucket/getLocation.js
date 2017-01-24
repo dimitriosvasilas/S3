@@ -21,42 +21,18 @@ const AWSregions = ['us-west-1', 'us-west-2', 'ca-central-1',
 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'sa-east-1',
 'us-east-2'];
 
-const itSkipIfAWS = process.env.AWS_ON_AIR ? it.skip : it;
+const describeSkipAWS = process.env.AWS_ON_AIR ? describe.skip : describe;
 
-describe('GET bucket location', () => {
+describeSkipAWS('GET bucket location ', () => {
     withV4(sigCfg => {
         const bucketUtil = new BucketUtility('default', sigCfg);
         const s3 = bucketUtil.s3;
         const otherAccountBucketUtility = new BucketUtility('lisa', {});
         const otherAccountS3 = otherAccountBucketUtility.s3;
 
-        AWSregions.forEach(location => {
-            describe(`on bucket with AWS region location: ${location}`, () => {
-                before(done => s3.createBucketAsync(
-                    {
-                        Bucket: bucketName,
-                        CreateBucketConfiguration: {
-                            LocationConstraint: location,
-                        },
-                    }, done));
-                after(() => bucketUtil.deleteOne(bucketName));
-
-                it('should return location configuration successfully',
-                done => {
-                    s3.getBucketLocation({ Bucket: bucketName },
-                    (err, data) => {
-                        assert.strictEqual(err, null,
-                            `Found unexpected err ${err}`);
-                        assert.deepStrictEqual(data.LocationConstraint,
-                            location);
-                        return done();
-                    });
-                });
-            });
-        });
-        Object.keys(configLocationConstraints).forEach(
+        Object.keys(configLocationConstraints).concat(AWSregions).forEach(
         location => {
-            describe(`on bucket with S3 server location: ${location}`, () => {
+            describeSkipAWS(`with location: ${location}`, () => {
                 before(done => s3.createBucketAsync(
                     {
                         Bucket: bucketName,
@@ -66,7 +42,8 @@ describe('GET bucket location', () => {
                     }, done));
                 after(() => bucketUtil.deleteOne(bucketName));
 
-                itSkipIfAWS('should return location configuration successfully',
+                it(`should return location configuration: ${location} ` +
+                'successfully',
                 done => {
                     s3.getBucketLocation({ Bucket: bucketName },
                     (err, data) => {
@@ -80,7 +57,7 @@ describe('GET bucket location', () => {
             });
         });
 
-        describe('on bucket without location configuration', () => {
+        describe('without location configuration', () => {
             afterEach(() => bucketUtil.deleteOne(bucketName));
             before(done => s3.createBucketAsync({ Bucket: bucketName }, done));
             it('should return default location',

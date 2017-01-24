@@ -23,6 +23,8 @@ const AWSregions = ['us-west-1', 'us-west-2', 'ca-central-1',
 
 const bucketName = 'bucketlocation';
 
+const describeSkipAWS = process.env.AWS_ON_AIR ? describe.skip : describe;
+
 describe('PUT Bucket - AWS.S3.createBucket', () => {
     describe('When user is unauthorized', () => {
         let s3;
@@ -154,28 +156,13 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
             it('should create bucket if name is an IP address with some suffix',
                 done => _test('192.168.5.4-suffix', done));
         });
-
-        AWSregions.forEach(location => {
-            describe('bucket creation with AWS S3 regions: ', () => {
+        Object.keys(configLocationConstraints).concat(AWSregions).forEach(
+        location => {
+            describeSkipAWS(`bucket creation with location: ${location}`,
+            () => {
                 after(done => bucketUtil.deleteOne(bucketName).then(() =>
                 done()).catch(done));
-                it(`${location}`, done => {
-                    bucketUtil.s3.createBucketAsync(
-                        {
-                            Bucket: bucketName,
-                            CreateBucketConfiguration: {
-                                LocationConstraint: location,
-                            },
-                        }, done);
-                });
-            });
-        });
-
-        Object.keys(configLocationConstraints).forEach(location => {
-            describe('bucket creation with S3 server location: ', () => {
-                after(done => bucketUtil.deleteOne(bucketName).then(() =>
-                done()).catch(done));
-                it(`${location}`, done => {
+                it(`should create bucket with location: ${location}`, done => {
                     bucketUtil.s3.createBucketAsync(
                         {
                             Bucket: bucketName,
