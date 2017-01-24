@@ -5,6 +5,24 @@ import BucketUtility from '../../lib/utility/bucket-util';
 import getConfig from '../support/config';
 import withV4 from '../support/withV4';
 
+// Change these locations with the config ones
+const configLocationConstraints = {
+    'aws-us-east-1': 'aws-us-east-1-value',
+    'aws-us-east-test': 'aws-us-east-test-value',
+    'scality-us-east-1': 'scality-us-east-1-value',
+    'scality-us-west-1': 'scality-us-west-1-value',
+    'virtual-user-metadata': 'virtual-user-metadata-value',
+    'file': 'file-value',
+    'mem': 'mem-value',
+};
+
+const AWSregions = ['us-west-1', 'us-west-2', 'ca-central-1',
+'EU', 'eu-west-1', 'eu-west-2', 'eu-central-1', 'ap-south-1', 'ap-southeast-1',
+'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'sa-east-1',
+'us-east-2'];
+
+const bucketName = 'bucketlocation';
+
 describe('PUT Bucket - AWS.S3.createBucket', () => {
     describe('When user is unauthorized', () => {
         let s3;
@@ -135,6 +153,55 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
 
             it('should create bucket if name is an IP address with some suffix',
                 done => _test('192.168.5.4-suffix', done));
+        });
+
+        AWSregions.forEach(location => {
+            describe('bucket creation with AWS S3 regions: ', () => {
+                after(done => bucketUtil.deleteOne(bucketName).then(() =>
+                done()).catch(done));
+                it(`${location}`, done => {
+                    bucketUtil.s3.createBucketAsync(
+                        {
+                            Bucket: bucketName,
+                            CreateBucketConfiguration: {
+                                LocationConstraint: location,
+                            },
+                        }, done);
+                });
+            });
+        });
+
+        Object.keys(configLocationConstraints).forEach(location => {
+            describe('bucket creation with S3 server location: ', () => {
+                after(done => bucketUtil.deleteOne(bucketName).then(() =>
+                done()).catch(done));
+                it(`${location}`, done => {
+                    bucketUtil.s3.createBucketAsync(
+                        {
+                            Bucket: bucketName,
+                            CreateBucketConfiguration: {
+                                LocationConstraint: location,
+                            },
+                        }, done);
+                });
+            });
+        });
+
+        describe('bucket creation with invalid location', () => {
+            it('should return errors InvalidLocationConstraint', done => {
+                bucketUtil.s3.createBucketAsync(
+                    {
+                        Bucket: bucketName,
+                        CreateBucketConfiguration: {
+                            LocationConstraint: 'coco',
+                        },
+                    }, err => {
+                    assert.strictEqual(err.code,
+                    'InvalidLocationConstraint');
+                    assert.strictEqual(err.statusCode, 400);
+                    done();
+                });
+            });
         });
     });
 });
