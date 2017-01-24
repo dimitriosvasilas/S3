@@ -252,12 +252,12 @@ describe('s3cmd putBucket', () => {
         exec(['mb', `s3://${invalidName}`], done, 11);
     });
 
-    it('should put a valid bucket with region (regardless of region)', done => {
-        exec(['mb', 's3://regioned', '--region=wherever'], done);
+    it('should put a valid bucket with region', done => {
+        exec(['mb', 's3://regioned', '--region=us-east-1'], done);
     });
 
     it('should delete bucket put with region', done => {
-        exec(['rb', 's3://regioned', '--region=wherever'], done);
+        exec(['rb', 's3://regioned', '--region=us-east-1'], done);
     });
 
     if (process.env.ENABLE_KMS_ENCRYPTION === 'true') {
