@@ -40,7 +40,7 @@ const configLocationConstraints = {
 const AWSregions = ['us-west-1', 'us-west-2', 'ca-central-1',
 'EU', 'eu-west-1', 'eu-west-2', 'eu-central-1', 'ap-south-1', 'ap-southeast-1',
 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'sa-east-1',
-'us-east-2', ''];
+'us-east-2'];
 
 
 describe('getBucketLocation API', () => {
@@ -63,6 +63,29 @@ describe('getBucketLocation API', () => {
                     const xml = `<?xml version="1.0" encoding="UTF-8"?>
         <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">` +
           `${location}</LocationConstraint>`;
+                    assert.deepStrictEqual(res, xml);
+                    return done();
+                });
+            });
+        });
+    });
+    [undefined, 'us-east-1'].forEach(location => {
+        describe(`with ${location} LocationConstraint`, () => {
+            beforeEach(done => {
+                cleanup();
+                bucketPut(authInfo, testBucketPutRequest, location, log, done);
+            });
+            afterEach(() => cleanup());
+            it('should return empty string LocationConstraint xml', done => {
+                bucketGetLocation(authInfo, testGetLocationRequest, log,
+                (err, res) => {
+                    if (err) {
+                        process.stdout.write(`Err putting cors config ${err}`);
+                        return done(err);
+                    }
+                    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+        <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">` +
+        '</LocationConstraint>';
                     assert.deepStrictEqual(res, xml);
                     return done();
                 });

@@ -72,6 +72,27 @@ describeSkipAWS('GET bucket location ', () => {
             });
         });
 
+        describe('without location us-east-1', () => {
+            before(done => s3.createBucketAsync(
+                {
+                    Bucket: bucketName,
+                    CreateBucketConfiguration: {
+                        LocationConstraint: 'us-east-1',
+                    },
+                }, done));
+            afterEach(() => bucketUtil.deleteOne(bucketName));
+            it('should return default location',
+            done => {
+                s3.getBucketLocation({ Bucket: bucketName },
+                (err, data) => {
+                    assert.strictEqual(err, null,
+                        `Found unexpected err ${err}`);
+                    assert.deepStrictEqual(data.LocationConstraint, '');
+                    return done();
+                });
+            });
+        });
+
         describe('with existing configuration', () => {
             before(done => s3.createBucketAsync(
                 {
