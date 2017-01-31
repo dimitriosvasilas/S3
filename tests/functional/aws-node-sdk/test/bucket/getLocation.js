@@ -2,33 +2,9 @@ import assert from 'assert';
 
 import withV4 from '../support/withV4';
 import BucketUtility from '../../lib/utility/bucket-util';
+import config from '../../../../../Config';
 
 const bucketName = 'testgetlocationbucket';
-
-// Change these locations with the config ones
-// import config from '../../Config';
-const config =
-    { locationConstraints: {
-        'aws-us-east-1': {
-            type: 'aws_s3',
-            information: {
-                region: 'us-east-1',
-                bucketName: 'premadebucket',
-                credentialsProfile: 'default',
-            },
-        },
-        'file': {
-            type: 'file',
-            information: {
-            },
-        },
-        'mem': {
-            type: 'mem',
-            information: {
-            },
-        },
-    },
-};
 
 const describeSkipAWS = process.env.AWS_ON_AIR ? describe.skip : describe;
 
@@ -41,6 +17,11 @@ describeSkipAWS('GET bucket location ', () => {
 
         Object.keys(config.locationConstraints).forEach(
         location => {
+            if (location === 'us-east-1') {
+                // if region us-east-1 should return empty string
+                // see next test.
+                return;
+            }
             describeSkipAWS(`with location: ${location}`, () => {
                 before(done => s3.createBucketAsync(
                     {
@@ -66,9 +47,15 @@ describeSkipAWS('GET bucket location ', () => {
             });
         });
 
-        describe('without location configuration', () => {
+        describe('with location us-east-1', () => {
+            before(done => s3.createBucketAsync(
+                {
+                    Bucket: bucketName,
+                    CreateBucketConfiguration: {
+                        LocationConstraint: 'us-east-1',
+                    },
+                }, done));
             afterEach(() => bucketUtil.deleteOne(bucketName));
-            before(done => s3.createBucketAsync({ Bucket: bucketName }, done));
             it('should return default location',
             done => {
                 s3.getBucketLocation({ Bucket: bucketName },
@@ -81,15 +68,9 @@ describeSkipAWS('GET bucket location ', () => {
             });
         });
 
-        describe('with location us-east-1', () => {
-            before(done => s3.createBucketAsync(
-                {
-                    Bucket: bucketName,
-                    CreateBucketConfiguration: {
-                        LocationConstraint: 'us-east-1',
-                    },
-                }, done));
+        describe('without location configuration', () => {
             afterEach(() => bucketUtil.deleteOne(bucketName));
+            before(done => s3.createBucketAsync({ Bucket: bucketName }, done));
             it('should return default location',
             done => {
                 s3.getBucketLocation({ Bucket: bucketName },

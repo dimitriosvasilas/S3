@@ -6,6 +6,7 @@ import { cleanup,
     DummyRequestLogger,
     makeAuthInfo }
 from '../helpers';
+import config from '../../../Config';
 
 const log = new DummyRequestLogger();
 const authInfo = makeAuthInfo('accessKey1');
@@ -26,34 +27,13 @@ const testGetLocationRequest = {
     query: { location: '' },
 };
 
-// Change these locations with the config ones
-// import config from '../../../Config';
-const config =
-    { locationConstraints: {
-        'aws-us-east-1': {
-            type: 'aws_s3',
-            information: {
-                region: 'us-east-1',
-                bucketName: 'premadebucket',
-                credentialsProfile: 'default',
-            },
-        },
-        'file': {
-            type: 'file',
-            information: {
-            },
-        },
-        'mem': {
-            type: 'mem',
-            information: {
-            },
-        },
-    },
-};
-
-
 describe('getBucketLocation API', () => {
     Object.keys(config.locationConstraints).forEach(location => {
+        if (location === 'us-east-1') {
+            // if region us-east-1 should return empty string
+            // see next test.
+            return;
+        }
         describe(`with ${location} LocationConstraint`, () => {
             beforeEach(done => {
                 cleanup();

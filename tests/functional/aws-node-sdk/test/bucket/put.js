@@ -4,31 +4,7 @@ import { S3 } from 'aws-sdk';
 import BucketUtility from '../../lib/utility/bucket-util';
 import getConfig from '../support/config';
 import withV4 from '../support/withV4';
-
-// Change these locations with the config ones
-// import config from '../../Config';
-const config =
-    { locationConstraints: {
-        'aws-us-east-1': {
-            type: 'aws_s3',
-            information: {
-                region: 'us-east-1',
-                bucketName: 'premadebucket',
-                credentialsProfile: 'default',
-            },
-        },
-        'file': {
-            type: 'file',
-            information: {
-            },
-        },
-        'mem': {
-            type: 'mem',
-            information: {
-            },
-        },
-    },
-};
+import configOff from '../../../../../Config';
 
 const bucketName = 'bucketlocation';
 
@@ -165,7 +141,7 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
             it('should create bucket if name is an IP address with some suffix',
                 done => _test('192.168.5.4-suffix', done));
         });
-        Object.keys(config.locationConstraints).forEach(
+        Object.keys(configOff.locationConstraints).forEach(
         location => {
             describeSkipAWS(`bucket creation with location: ${location}`,
             () => {
