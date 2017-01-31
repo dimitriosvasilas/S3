@@ -9,7 +9,7 @@ import { makeAuthInfo } from '../helpers';
 const bucketName = 'creationbucket';
 const log = new DummyRequestLogger();
 const normalBehaviorLocationConstraint = 'us-west-1';
-const specialBehaviorLocationConstraint = 'us-east-1';
+const specialBehaviorLocationConstraint = 'aws-us-east-1';
 const usEastBehavior = true;
 const headers = {};
 const authInfo = makeAuthInfo('accessKey1');

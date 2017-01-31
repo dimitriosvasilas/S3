@@ -14,7 +14,7 @@ const namespace = 'default';
 const splitter = constants.splitter;
 const usersBucket = constants.usersBucket;
 const bucketName = 'bucketname';
-const locationConstraint = 'us-west-1';
+const locationConstraint = 'aws-us-east-1';
 const testRequest = {
     bucketName,
     namespace,

@@ -6,20 +6,29 @@ import BucketUtility from '../../lib/utility/bucket-util';
 const bucketName = 'testgetlocationbucket';
 
 // Change these locations with the config ones
-const configLocationConstraints = {
-    'aws-us-east-1': 'aws-us-east-1-value',
-    'aws-us-east-test': 'aws-us-east-test-value',
-    'scality-us-east-1': 'scality-us-east-1-value',
-    'scality-us-west-1': 'scality-us-west-1-value',
-    'virtual-user-metadata': 'virtual-user-metadata-value',
-    'file': 'file-value',
-    'mem': 'mem-value',
+// import config from '../../Config';
+const config =
+    { locationConstraints: {
+        'aws-us-east-1': {
+            type: 'aws_s3',
+            information: {
+                region: 'us-east-1',
+                bucketName: 'premadebucket',
+                credentialsProfile: 'default',
+            },
+        },
+        'file': {
+            type: 'file',
+            information: {
+            },
+        },
+        'mem': {
+            type: 'mem',
+            information: {
+            },
+        },
+    },
 };
-
-const AWSregions = ['us-west-1', 'us-west-2', 'ca-central-1',
-'EU', 'eu-west-1', 'eu-west-2', 'eu-central-1', 'ap-south-1', 'ap-southeast-1',
-'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'sa-east-1',
-'us-east-2'];
 
 const describeSkipAWS = process.env.AWS_ON_AIR ? describe.skip : describe;
 
@@ -30,7 +39,7 @@ describeSkipAWS('GET bucket location ', () => {
         const otherAccountBucketUtility = new BucketUtility('lisa', {});
         const otherAccountS3 = otherAccountBucketUtility.s3;
 
-        Object.keys(configLocationConstraints).concat(AWSregions).forEach(
+        Object.keys(config.locationConstraints).forEach(
         location => {
             describeSkipAWS(`with location: ${location}`, () => {
                 before(done => s3.createBucketAsync(
@@ -72,7 +81,7 @@ describeSkipAWS('GET bucket location ', () => {
             });
         });
 
-        describe('without location us-east-1', () => {
+        describe('with location us-east-1', () => {
             before(done => s3.createBucketAsync(
                 {
                     Bucket: bucketName,

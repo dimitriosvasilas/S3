@@ -19,7 +19,7 @@ const log = new DummyRequestLogger();
 const namespace = 'default';
 const postBody = Buffer.from('I am a body', 'utf8');
 const prefix = 'sub';
-const locationConstraint = 'us-west-1';
+const locationConstraint = 'aws-us-east-1';
 
 let testPutBucketRequest;
 let testPutObjectRequest1;

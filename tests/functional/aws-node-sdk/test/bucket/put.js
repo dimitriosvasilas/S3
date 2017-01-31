@@ -6,20 +6,29 @@ import getConfig from '../support/config';
 import withV4 from '../support/withV4';
 
 // Change these locations with the config ones
-const configLocationConstraints = {
-    'aws-us-east-1': 'aws-us-east-1-value',
-    'aws-us-east-test': 'aws-us-east-test-value',
-    'scality-us-east-1': 'scality-us-east-1-value',
-    'scality-us-west-1': 'scality-us-west-1-value',
-    'virtual-user-metadata': 'virtual-user-metadata-value',
-    'file': 'file-value',
-    'mem': 'mem-value',
+// import config from '../../Config';
+const config =
+    { locationConstraints: {
+        'aws-us-east-1': {
+            type: 'aws_s3',
+            information: {
+                region: 'us-east-1',
+                bucketName: 'premadebucket',
+                credentialsProfile: 'default',
+            },
+        },
+        'file': {
+            type: 'file',
+            information: {
+            },
+        },
+        'mem': {
+            type: 'mem',
+            information: {
+            },
+        },
+    },
 };
-
-const AWSregions = ['us-west-1', 'us-west-2', 'ca-central-1',
-'EU', 'eu-west-1', 'eu-west-2', 'eu-central-1', 'ap-south-1', 'ap-southeast-1',
-'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2', 'sa-east-1',
-'us-east-2', 'us-east-1'];
 
 const bucketName = 'bucketlocation';
 
@@ -156,7 +165,7 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
             it('should create bucket if name is an IP address with some suffix',
                 done => _test('192.168.5.4-suffix', done));
         });
-        Object.keys(configLocationConstraints).concat(AWSregions).forEach(
+        Object.keys(config.locationConstraints).forEach(
         location => {
             describeSkipAWS(`bucket creation with location: ${location}`,
             () => {

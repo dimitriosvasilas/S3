@@ -46,7 +46,7 @@ const otherAccountAuthInfo = makeAuthInfo('accessKey2');
 const namespace = 'default';
 const usersBucketName = constants.usersBucket;
 const bucketName = 'bucketname';
-const locationConstraint = 'us-west-1';
+const locationConstraint = 'aws-us-east-1';
 const baseTestRequest = {
     bucketName,
     namespace,

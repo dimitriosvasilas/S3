@@ -9,7 +9,7 @@ const log = new DummyRequestLogger();
 const authInfo = makeAuthInfo('accessKey1');
 const namespace = 'default';
 const bucketName = 'bucketname';
-const locationConstraint = 'us-west-1';
+const locationConstraint = 'aws-us-east-1';
 const testRequest = {
     bucketName,
     namespace,

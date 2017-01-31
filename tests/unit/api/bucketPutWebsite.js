@@ -15,7 +15,7 @@ import metadata from '../../../lib/metadata/wrapper';
 const log = new DummyRequestLogger();
 const authInfo = makeAuthInfo('accessKey1');
 const bucketName = 'bucketname';
-const locationConstraint = 'us-west-1';
+const locationConstraint = 'aws-us-east-1';
 const testBucketPutRequest = {
     bucketName,
     headers: { host: `${bucketName}.s3.amazonaws.com` },

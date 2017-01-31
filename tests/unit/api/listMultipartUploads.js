@@ -14,7 +14,7 @@ const canonicalID = 'accessKey1';
 const authInfo = makeAuthInfo(canonicalID);
 const namespace = 'default';
 const bucketName = 'bucketname';
-const locationConstraint = 'us-west-1';
+const locationConstraint = 'aws-us-east-1';
 
 describe('listMultipartUploads API', () => {
     beforeEach(() => {
