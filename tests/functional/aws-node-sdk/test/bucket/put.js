@@ -4,7 +4,7 @@ import { S3 } from 'aws-sdk';
 import BucketUtility from '../../lib/utility/bucket-util';
 import getConfig from '../support/config';
 import withV4 from '../support/withV4';
-import configOff from '../../../../../Config';
+import configOff from '../../../../../lib/Config';
 
 const bucketName = 'bucketlocation';
 

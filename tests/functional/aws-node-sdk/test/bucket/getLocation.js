@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import withV4 from '../support/withV4';
 import BucketUtility from '../../lib/utility/bucket-util';
-import config from '../../../../../Config';
+import config from '../../../../../lib/Config';
 
 const bucketName = 'testgetlocationbucket';
 

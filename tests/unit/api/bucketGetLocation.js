@@ -6,7 +6,7 @@ import { cleanup,
     DummyRequestLogger,
     makeAuthInfo }
 from '../helpers';
-import config from '../../../Config';
+import config from '../../../lib/Config';
 
 const log = new DummyRequestLogger();
 const authInfo = makeAuthInfo('accessKey1');
