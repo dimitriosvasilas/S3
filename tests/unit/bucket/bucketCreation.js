@@ -5,14 +5,20 @@ import { errors } from 'arsenal';
 import { cleanup, DummyRequestLogger } from '../helpers';
 import { createBucket } from '../../../lib/api/apiUtils/bucket/bucketCreation';
 import { makeAuthInfo } from '../helpers';
+import config from '../../../lib/Config';
 
 const bucketName = 'creationbucket';
 const log = new DummyRequestLogger();
-const normalBehaviorLocationConstraint = 'scality-us-west-1';
-const specialBehaviorLocationConstraint = 'aws-us-east-1';
 const usEastBehavior = true;
 const headers = {};
 const authInfo = makeAuthInfo('accessKey1');
+
+let normalBehaviorLocationConstraint = 'us-west-1';
+let specialBehaviorLocationConstraint = 'us-east-1';
+if (config.locationConstraints) {
+    normalBehaviorLocationConstraint = 'scality-us-west-1';
+    specialBehaviorLocationConstraint = 'aws-us-east-1';
+}
 
 describe('bucket creation', () => {
     it('should create a bucket', done => {

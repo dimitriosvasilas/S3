@@ -27,8 +27,12 @@ const testGetLocationRequest = {
     query: { location: '' },
 };
 
+// test for old and new config
+const locationConstraints = config.locationConstraints ||
+{ foo: 'foo', toto: 'toto' };
+
 describe('getBucketLocation API', () => {
-    Object.keys(config.locationConstraints).forEach(location => {
+    Object.keys(locationConstraints).forEach(location => {
         if (location === 'us-east-1') {
             // if region us-east-1 should return empty string
             // see next test.

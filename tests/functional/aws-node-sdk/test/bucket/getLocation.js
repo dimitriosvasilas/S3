@@ -14,8 +14,10 @@ describeSkipAWS('GET bucket location ', () => {
         const s3 = bucketUtil.s3;
         const otherAccountBucketUtility = new BucketUtility('lisa', {});
         const otherAccountS3 = otherAccountBucketUtility.s3;
-
-        Object.keys(config.locationConstraints).forEach(
+        // test for old and new config
+        const locationConstraints = config.locationConstraints ||
+        { foo: 'foo', toto: 'toto' };
+        Object.keys(locationConstraints).forEach(
         location => {
             if (location === 'us-east-1') {
                 // if region us-east-1 should return empty string

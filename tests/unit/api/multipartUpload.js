@@ -15,6 +15,7 @@ import { metadata } from '../../../lib/metadata/in_memory/metadata';
 import multipartDelete from '../../../lib/api/multipartDelete';
 import objectPutPart from '../../../lib/api/objectPutPart';
 import DummyRequest from '../DummyRequest';
+import config from '../../../lib/Config';
 
 const log = new DummyRequestLogger();
 
@@ -32,7 +33,8 @@ const bucketPutRequest = {
     url: '/',
     post: '',
 };
-const locationConstraint = 'aws-us-east-1';
+const locationConstraint = config.locationConstraints ? 'aws-us-east-1' :
+'us-east-1';
 const objectKey = 'testObject';
 const initiateRequest = {
     bucketName,

@@ -10,6 +10,12 @@ const bucketName = 'bucketlocation';
 
 const describeSkipAWS = process.env.AWS_ON_AIR ? describe.skip : describe;
 
+const describeSkipLocation = configOff.locationConstraints ? describe :
+describe.skip;
+// test for old and new config
+const locationConstraints = configOff.locationConstraints ||
+{ foo: 'foo', toto: 'toto' };
+
 describe('PUT Bucket - AWS.S3.createBucket', () => {
     describe('When user is unauthorized', () => {
         let s3;
@@ -141,7 +147,7 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
             it('should create bucket if name is an IP address with some suffix',
                 done => _test('192.168.5.4-suffix', done));
         });
-        Object.keys(configOff.locationConstraints).forEach(
+        Object.keys(locationConstraints).forEach(
         location => {
             describeSkipAWS(`bucket creation with location: ${location}`,
             () => {
@@ -159,7 +165,7 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
             });
         });
 
-        describe('bucket creation with invalid location', () => {
+        describeSkipLocation('bucket creation with invalid location', () => {
             it('should return errors InvalidLocationConstraint', done => {
                 bucketUtil.s3.createBucketAsync(
                     {

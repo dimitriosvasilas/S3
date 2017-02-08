@@ -37,6 +37,7 @@ import objectPutPart from '../../../lib/api/objectPutPart';
 import { DummyRequestLogger, makeAuthInfo } from '../helpers';
 import { parseString } from 'xml2js';
 import serviceGet from '../../../lib/api/serviceGet';
+import config from '../../../lib/Config';
 
 const log = new DummyRequestLogger();
 const accessKey = 'accessKey1';
@@ -63,7 +64,8 @@ const userBucketOwner = 'admin';
 const creationDate = new Date().toJSON();
 const usersBucket = new BucketInfo(usersBucketName,
     userBucketOwner, userBucketOwner, creationDate);
-const locationConstraint = 'aws-us-east-1';
+const locationConstraint = config.locationConstraints ? 'aws-us-east-1' :
+    'us-east-1';
 
 
 describe('transient bucket handling', () => {
