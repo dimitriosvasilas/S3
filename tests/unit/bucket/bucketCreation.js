@@ -17,7 +17,7 @@ let normalBehaviorLocationConstraint = 'us-west-1';
 let specialBehaviorLocationConstraint = 'us-east-1';
 if (config.locationConstraints) {
     normalBehaviorLocationConstraint = 'scality-us-west-1';
-    specialBehaviorLocationConstraint = 'aws-us-east-1';
+    specialBehaviorLocationConstraint = 'scality-us-east-1';
 }
 
 describe('bucket creation', () => {
