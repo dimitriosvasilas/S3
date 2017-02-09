@@ -21,4 +21,14 @@ describe('unsupported query requests:', () => {
             });
         });
     });
+
+    itSkipIfAWS('should accept blacklisted query field as a value ' +
+    `e.g. ?test=${constants.unsupportedQueries[0]}`, done => {
+        const queryObj = { test: constants.unsupportedQueries[0] };
+        makeS3Request({ method: 'GET', queryObj, bucket, objectKey }, err => {
+            assert.strictEqual(err.code, 'NoSuchBucket');
+            assert.strictEqual(err.statusCode, 404);
+            done();
+        });
+    });
 });
