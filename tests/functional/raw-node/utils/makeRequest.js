@@ -2,7 +2,7 @@ import http from 'http';
 import https from 'https';
 import querystring from 'querystring';
 
-import conf from '../../../../../lib/Config';
+import conf from '../../../../lib/Config';
 
 const transport = conf.https ? https : http;
 const ipAddress = process.env.IP ? process.env.IP : '127.0.0.1';
@@ -28,29 +28,21 @@ function _parseError(responseBody) {
  * @param {string} params.method - request method
  * @param {object} params.queryObj - query fields and their string values
  * @param {object} params.headers - headers and their string values
- * @param {string} params.bucket - bucket name
- * @param {string} params.objectKey - object key name
+ * @param {string} params.path - request path
  * @param {function} callback - with error and response parameters
  * @return {undefined} - and call callback
  */
 export default function makeRequest(params, callback) {
-    const { hostname, port, method, queryObj, headers, bucket, objectKey }
+    const { hostname, port, method, queryObj, headers, path }
         = params;
     const options = {
-        hostname: hostname || ipAddress, // default to where S3 Server is hosted
-        port: port || 8000, // default to port 8000
+        hostname,
+        port,
         method,
         headers,
-        path: bucket ? `/${bucket}` : '/',
+        path: path || '/',
         rejectUnauthorized: false,
     };
-    if (process.env.AWS_ON_AIR) {
-        options.hostname = 's3.amazonaws.com';
-        options.port = 80;
-    }
-    if (objectKey) {
-        options.path = `${options.path}${objectKey}`;
-    }
     if (queryObj) {
         const qs = querystring.stringify(queryObj);
         options.path = `${options.path}?${qs}`;
@@ -84,4 +76,30 @@ export default function makeRequest(params, callback) {
         return callback(err);
     });
     req.end();
+}
+
+/** makeRequest - utility function to generate a request
+ * @param {object} params - params for making request
+ * @param {string} params.method - request method
+ * @param {object} params.queryObj - query fields and their string values
+ * @param {object} params.headers - headers and their string values
+ * @param {string} params.bucket - bucket name
+ * @param {string} params.objectKey - object key name
+ * @param {function} callback - with error and response parameters
+ * @return {undefined} - and call callback
+ */
+export function makeS3Request(params, callback) {
+    const { method, queryObj, headers, bucket, objectKey } = params;
+    const options = {
+        hostname: process.env.AWS_ON_AIR ? 's3.amazonaws.com' : ipAddress,
+        port: process.env.AWS_ON_AIR ? 80 : 8000,
+        method,
+        queryObj,
+        headers,
+        path: bucket ? `/${bucket}` : '/',
+    };
+    if (objectKey) {
+        options.path = `${options.path}${objectKey}`;
+    }
+    makeRequest(options, callback);
 }
