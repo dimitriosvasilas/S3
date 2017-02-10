@@ -691,6 +691,16 @@ describe('s3cmd put, get and delete object with spaces ' +
 });
 
 describe('s3cmd info', () => {
+    const bucket = 's3cmdinfobucket';
+
+    beforeEach(done => {
+        exec(['mb', `s3://${bucket}`], done);
+    });
+
+    afterEach(done => {
+        exec(['rb', `s3://${bucket}`], done);
+    });
+
     // test that POLICY and CORS are returned as 'none'
     it('should find that policy has a value of none', done => {
         checkRawOutput(['info', `s3://${bucket}`], 'policy', 'none',
