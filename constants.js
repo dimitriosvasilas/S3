@@ -73,6 +73,8 @@ export default {
         'analytics',
         'inventory',
         'lifecycle',
+        'list-type',
+        'location',
         'logging',
         'metrics',
         'notification',
