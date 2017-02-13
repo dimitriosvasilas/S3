@@ -24,8 +24,11 @@ dependencies:
     - sudo pip install flake8 yamllint
     # s3cmd dependencies
     - sudo apt-get install -y -q python-dateutil python-magic
-    - wget http://launchpadlibrarian.net/222422124/s3cmd_1.6.0-2_all.deb
-    - sudo dpkg -i s3cmd*.deb
+    # yamllint disable-line rule:line-length
+    - wget https://launchpad.net/ubuntu/+archive/primary/+files/s3cmd_1.6.1.orig.tar.gz
+    - tar -xf s3cmd_1.6.1.orig.tar.gz
+        && cd s3cmd-1.6.1
+        && sudo python setup.py install
     # fog and ruby testing dependencies
     - gem install fog
     - gem install mime-types
