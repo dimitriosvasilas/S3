@@ -111,6 +111,27 @@ function checkRawOutput(args, lineFinder, testString, cb) {
     });
 }
 
+// Test stderr against expected output
+function checkErrOutput(args, lineFinder, testString, cb) {
+    let av = ['-c', configCfg].concat(args);
+    if (isScality) {
+        av = av.concat(isScality);
+    }
+    process.stdout.write(`${program} ${av}\n`);
+    const allData = [];
+    const child = proc.spawn(program, av);
+    child.stderr.on('data', data => {
+        allData.push(data.toString());
+        process.stdout.write(data.toString());
+    });
+    child.on('close', () => {
+        const foundIt = allData.join('').split('\n')
+            .filter(item => item.indexOf(lineFinder) > -1)
+            .some(item => item.indexOf(testString) > -1);
+        return cb(foundIt);
+    });
+}
+
 
 function findEndString(data, start) {
     const delimiter = data[start];
@@ -283,7 +304,11 @@ describe('s3cmd put and get bucket ACLs', function aclBuck() {
         exec(['setacl', `s3://${bucket}`, '--acl-public'], done);
     });
 
-    it('should get canned ACL that was set', done => {
+    // TODO: Unskip when getBucketLocation has been implemented
+    // We currently return NotImplemented to ?location queries, so `s3cmd info`
+    // will not print info for canned ACL (but once we support those queries,
+    // this test should work again)
+    it.skip('should get canned ACL that was set', done => {
         checkRawOutput(['info', `s3://${bucket}`], 'ACL', '*anon*: READ',
         foundIt => {
             assert(foundIt);
@@ -296,7 +321,11 @@ describe('s3cmd put and get bucket ACLs', function aclBuck() {
         `--acl-grant=write:${emailAccount}`], done);
     });
 
-    it('should get specific ACL that was set', done => {
+    // TODO: Unskip when getBucketLocation has been implemented
+    // We currently return NotImplemented to ?location queries, so `s3cmd info`
+    // will not print info for canned ACL (but once we support those queries,
+    // this test should work again)
+    it.skip('should get specific ACL that was set', done => {
         checkRawOutput(['info', `s3://${bucket}`], 'ACL',
         `${lowerCaseEmail}: WRITE`, foundIt => {
             assert(foundIt);
@@ -690,7 +719,33 @@ describe('s3cmd put, get and delete object with spaces ' +
     });
 });
 
+// TODO: Remove this test when getBucketLocation is implemented
 describe('s3cmd info', () => {
+    const bucket = 's3cmdinfobucket';
+
+    beforeEach(done => {
+        exec(['mb', `s3://${bucket}`], done);
+    });
+
+    afterEach(done => {
+        exec(['rb', `s3://${bucket}`], done);
+    });
+
+    it('should find s3cmd info returns NotImplemented error because ' +
+    '?location queries are not supported', done => {
+        checkErrOutput(['info', `s3://${bucket}`], 'ERROR',
+        '501 (NotImplemented)', foundIt => {
+            assert(foundIt);
+            done();
+        });
+    });
+});
+
+// TODO: Unskip when getBucketLocation has been implemented
+// We currently return NotImplemented to ?location queries, so `s3cmd info`
+// will not print values for queries we do support (but once we support
+// ?location, these tests should work again)
+describe.skip('s3cmd info', () => {
     const bucket = 's3cmdinfobucket';
 
     beforeEach(done => {
