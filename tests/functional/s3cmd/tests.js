@@ -323,7 +323,7 @@ describe('s3cmd put and get bucket ACLs', function aclBuck() {
 
     // TODO: Unskip when getBucketLocation has been implemented
     // We currently return NotImplemented to ?location queries, so `s3cmd info`
-    // will not print info for canned ACL (but once we support those queries,
+    // will not print info for specific ACL (but once we support those queries,
     // this test should work again)
     it.skip('should get specific ACL that was set', done => {
         checkRawOutput(['info', `s3://${bucket}`], 'ACL',

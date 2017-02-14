@@ -23,7 +23,6 @@ const invalidQueryStrings = [
     `test&${unsupported}`,
     `test&${unsupported}=test`,
     `test&${unsupported}&test2`,
-    `test&${unsupported}=test`,
     `test&${unsupported}=test&test2`,
     `test&test2&${unsupported}`,
     `test&test2&${unsupported}=test`,
