@@ -37,7 +37,6 @@ import objectPutPart from '../../../lib/api/objectPutPart';
 import { DummyRequestLogger, makeAuthInfo } from '../helpers';
 import { parseString } from 'xml2js';
 import serviceGet from '../../../lib/api/serviceGet';
-import config from '../../../lib/Config';
 
 const log = new DummyRequestLogger();
 const accessKey = 'accessKey1';
@@ -76,7 +75,7 @@ describe('transient bucket handling', () => {
         bucketMD.addTransientFlag();
         bucketMD.setSpecificAcl(otherAccountAuthInfo.getCanonicalID(),
             'WRITE_ACP');
-        bucketMD.setLocationConstraint('us-east-1');
+        bucketMD.setLocationConstraint(locationConstraint);
         metadata.createBucket(bucketName, bucketMD, log, () => {
             metadata.createBucket(usersBucketName, usersBucket, log, () => {
                 done();
@@ -394,7 +393,12 @@ describe('transient bucket handling', () => {
 
         it('should return NoSuchUpload error if usEastBehavior is enabled',
         done => {
-            config.usEastBehavior = true;
+            if (config.locationConstraints) {
+                config.locationConstraints[locationConstraint].
+                legacyAwsBehavior = true;
+            } else {
+                config.usEastBehavior = true;
+            }
             multipartDelete(authInfo, deleteRequest, log, err => {
                 assert.deepStrictEqual(err, errors.NoSuchUpload);
                 done();
@@ -402,7 +406,12 @@ describe('transient bucket handling', () => {
         });
 
         it('should return no error if usEastBehavior is not enabled', done => {
-            config.usEastBehavior = false;
+            if (config.locationConstraints) {
+                config.locationConstraints[locationConstraint].
+                legacyAwsBehavior = false;
+            } else {
+                config.usEastBehavior = false;
+            }
             multipartDelete(authInfo, deleteRequest, log, err => {
                 assert.strictEqual(err, null);
                 return done();

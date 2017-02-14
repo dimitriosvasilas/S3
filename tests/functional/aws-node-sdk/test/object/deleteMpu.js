@@ -2,11 +2,15 @@ import assert from 'assert';
 
 import withV4 from '../support/withV4';
 import BucketUtility from '../../lib/utility/bucket-util';
+import config from '../../../../../lib/Config';
 
 const bucket = 'functestabortmultipart';
 const key = 'key';
 
 const itSkipIfAWS = process.env.AWS_ON_AIR ? it.skip : it;
+
+const westLocation = config.locationConstraints ? 'scality-us-west-1'
+: 'us-west-1';
 
 describe('DELETE multipart', () => {
     withV4(sigCfg => {
@@ -39,9 +43,12 @@ describe('DELETE multipart', () => {
             });
         });
 
-        describe('on existing bucket', () => {
+        describe('on existing bucket with us-west-1 location', () => {
             beforeEach(() =>
-                s3.createBucketAsync({ Bucket: bucket })
+                s3.createBucketAsync({ Bucket: bucket,
+                  CreateBucketConfiguration: {
+                      LocationConstraint: westLocation,
+                  } })
                 .catch(err => {
                     process.stdout.write(`Error in beforeEach: ${err}\n`);
                     throw err;
