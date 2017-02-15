@@ -10,7 +10,7 @@ const bucketName = 'bucketlocation';
 
 const describeSkipAWS = process.env.AWS_ON_AIR ? describe.skip : describe;
 
-const describeSkipLocation = configOff.locationConstraints ? describe :
+const describeSkipIfOldConfig = configOff.locationConstraints ? describe :
 describe.skip;
 // test for old and new config
 const locationConstraints = configOff.locationConstraints ||
@@ -45,6 +45,46 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
 
         before(() => {
             bucketUtil = new BucketUtility('default', sigCfg);
+        });
+
+        // Why describeSkipIfOldConfig?
+        // AWS returns 404 - NoSuchUpload in us-east-1. This behavior
+        // can be toggled to be compatible with AWS by enabling
+        // usEastBehavior in the config.
+        // describeSkipIfOldConfig
+        describeSkipIfOldConfig('create bucket twice', () => {
+            beforeEach(done => bucketUtil.s3.createBucket({ Bucket:
+              bucketName }, done));
+            afterEach(done => bucketUtil.s3.deleteBucket({ Bucket: bucketName },
+              done));
+            // AWS JS SDK send a request with locationConstraint us-east-1 if no
+            // locationConstraint provided.
+            it('should allow to recreate if no locationConstraints provided',
+            done => {
+                bucketUtil.s3.createBucket({ Bucket: bucketName }, done);
+            });
+            it('should allow to recreate if location "us-east-1"', done => {
+                bucketUtil.s3.createBucket({
+                    Bucket: bucketName,
+                    CreateBucketConfiguration: {
+                        LocationConstraint: 'us-east-1',
+                    },
+                }, done);
+            });
+            it('should allow to recreate if location "us-west-1"', done => {
+                bucketUtil.s3.createBucket({
+                    Bucket: bucketName,
+                    CreateBucketConfiguration: {
+                        LocationConstraint: 'scality-us-west-1',
+                    },
+                }, error => {
+                    assert.notEqual(error, null,
+                      'Expected failure but got success');
+                    assert.strictEqual(error.code, 'BucketAlreadyOwnedByYou');
+                    assert.strictEqual(error.statusCode, 409);
+                    done();
+                });
+            });
         });
 
         describe('bucket naming restriction', () => {
@@ -165,7 +205,7 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
             });
         });
 
-        describeSkipLocation('bucket creation with invalid location', () => {
+        describeSkipIfOldConfig('bucket creation with invalid location', () => {
             it('should return errors InvalidLocationConstraint', done => {
                 bucketUtil.s3.createBucketAsync(
                     {
