@@ -59,11 +59,11 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
               done));
             // AWS JS SDK send a request with locationConstraint us-east-1 if no
             // locationConstraint provided.
-            it('should allow to recreate if no locationConstraints provided',
+            it('should return a 200 if no locationConstraints provided.',
             done => {
                 bucketUtil.s3.createBucket({ Bucket: bucketName }, done);
             });
-            it('should allow to recreate if location "us-east-1"', done => {
+            it('should return a 200 if us-east behavior', done => {
                 bucketUtil.s3.createBucket({
                     Bucket: bucketName,
                     CreateBucketConfiguration: {
@@ -71,7 +71,7 @@ describe('PUT Bucket - AWS.S3.createBucket', () => {
                     },
                 }, done);
             });
-            it('should allow to recreate if location "us-west-1"', done => {
+            it('should return a 409 if us-west behavior', done => {
                 bucketUtil.s3.createBucket({
                     Bucket: bucketName,
                     CreateBucketConfiguration: {

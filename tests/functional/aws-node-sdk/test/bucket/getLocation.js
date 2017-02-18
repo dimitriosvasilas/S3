@@ -20,11 +20,11 @@ describeSkipAWS('GET bucket location ', () => {
         Object.keys(locationConstraints).forEach(
         location => {
             if (location === 'us-east-1') {
-                // if region us-east-1 should return empty string
+                // if location is us-east-1 should return empty string
                 // see next test.
                 return;
             }
-            describeSkipAWS(`with location: ${location}`, () => {
+            describe(`with location: ${location}`, () => {
                 before(done => s3.createBucketAsync(
                     {
                         Bucket: bucketName,
@@ -58,7 +58,7 @@ describeSkipAWS('GET bucket location ', () => {
                     },
                 }, done));
             afterEach(() => bucketUtil.deleteOne(bucketName));
-            it('should return default location',
+            it('should return empty location',
             done => {
                 s3.getBucketLocation({ Bucket: bucketName },
                 (err, data) => {
@@ -73,7 +73,7 @@ describeSkipAWS('GET bucket location ', () => {
         describe('without location configuration', () => {
             afterEach(() => bucketUtil.deleteOne(bucketName));
             before(done => s3.createBucketAsync({ Bucket: bucketName }, done));
-            it('should return default location',
+            it('should return empty location',
             done => {
                 s3.getBucketLocation({ Bucket: bucketName },
                 (err, data) => {
@@ -85,7 +85,7 @@ describeSkipAWS('GET bucket location ', () => {
             });
         });
 
-        describe('with existing configuration', () => {
+        describe('with location configuration', () => {
             before(done => s3.createBucketAsync(
                 {
                     Bucket: bucketName,
