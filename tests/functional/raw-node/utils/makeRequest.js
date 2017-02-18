@@ -78,7 +78,7 @@ export default function makeRequest(params, callback) {
     req.end();
 }
 
-/** makeRequest - utility function to generate a request
+/** makeS3Request - utility function to generate a request against S3
  * @param {object} params - params for making request
  * @param {string} params.method - request method
  * @param {object} params.queryObj - query fields and their string values
