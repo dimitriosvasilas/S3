@@ -95,6 +95,10 @@
        "readPreference": "primary",
        "database": "metadata"
     },
+    "logPropd": {
+        "host": "0.0.0.0",
+        "port": 50000
+    },
     "externalBackends": {
         "aws_s3": {
             "httpAgent": {

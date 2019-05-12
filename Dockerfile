@@ -5,6 +5,7 @@ ENV NO_PROXY localhost,127.0.0.1
 ENV no_proxy localhost,127.0.0.1
 
 EXPOSE 8000
+EXPOSE 50000
 
 COPY ./package.json /usr/src/app/
 COPY ./yarn.lock /usr/src/app/
@@ -19,7 +20,7 @@ RUN apt-get update \
     && mkdir -p /root/ssh \
     && ssh-keyscan -H github.com > /root/ssh/known_hosts \
     && yarn cache clean \
-    && yarn install --frozen-lockfile --production --ignore-optional \
+    && yarn install --production --ignore-optional \
     && apt-get autoremove --purge -y python git build-essential \
     && rm -rf /var/lib/apt/lists/* \
     && yarn cache clean \
