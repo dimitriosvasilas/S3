@@ -10,7 +10,10 @@
         "127.0.0.2": "us-east-1",
         "s3.amazonaws.com": "us-east-1",
         "zenko-cloudserver-replicator": "us-east-1",
-        "lb": "us-east-1"
+        "lb": "us-east-1",
+        "cloudserver-0": "us-east-1",
+        "cloudserver-1": "us-east-1",
+        "cloudserver-2": "us-east-1"
     },
     "websiteEndpoints": ["s3-website-us-east-1.amazonaws.com",
                         "s3-website.us-east-2.amazonaws.com",
